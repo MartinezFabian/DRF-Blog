@@ -18,8 +18,8 @@ class CustomAccountManager(BaseUserManager):
         user = self.model(
             email=email, username=username, first_name=first_name, last_name=last_name
         )
-        user.set_password(password)  # handles password hashing
-
+        # se establece la contraseña utilizando el método set_password. Esto asegura que se almacene de manera segura (hashed)
+        user.set_password(password)
         user.save()
 
         return user
@@ -54,7 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomAccountManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = ["username", "first_name", "last_name"]
 
     def __str__(self) -> str:
         return self.username
