@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from django.conf import settings
+
+
+User = settings.AUTH_USER_MODEL  # reference to users/CustomUser
 
 
 class Category(models.Model):
@@ -11,16 +14,10 @@ class Category(models.Model):
 
 
 class Post(models.Model):
-    def __str__(self) -> str:
-        return self.title
-
-    # filtrar de manera predeterminada los post con estado 'Published'
+    # filter by default the posts with status 'Published'.
     class PostObjects(models.Manager):
         def get_queryset(self):
             return super().get_queryset().filter(status="P")
-
-    class Meta:
-        ordering = ["-published"]
 
     STATUS_CHOICES = (
         ("D", "Draft"),
@@ -36,3 +33,12 @@ class Post(models.Model):
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
+
+    objects = models.Manager()  # default manager
+    published_objects = PostObjects()  # custom manager PostObjects
+
+    class Meta:
+        ordering = ["-published"]
+
+    def __str__(self) -> str:
+        return self.title
