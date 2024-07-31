@@ -1,14 +1,32 @@
 from rest_framework import generics
 from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from django.shortcuts import get_object_or_404
+
 from .serializers import PostSerializer
 from .models import Post
 
 
 # Create your views here.
 
+# all users
 
-class PostUserList(generics.ListAPIView):
+
+class AllPostList(generics.ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+
+
+class PostDetail(generics.RetrieveAPIView):
+    serializer_class = PostSerializer
+
+    def get_object(self, queryset=None, **kwargs):
+        slug_query = self.kwargs.get("pk")
+        return get_object_or_404(Post, slug=slug_query)
+
+
+# only authenticated users
+class UserPostList(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = PostSerializer
