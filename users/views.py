@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .serializers import CustomUserSerializer
 from users.models import CustomUser
+from rest_framework.authentication import TokenAuthentication
 
 
 class RegisterUser(APIView):
@@ -47,3 +48,16 @@ class LoginUser(APIView):
         return Response(
             {"token": token.key, "user": json_user}, status=status.HTTP_200_OK
         )
+
+
+class LogoutUser(APIView):
+    authentication_classes = [
+        TokenAuthentication
+    ]  # verifica que la request tenga un token
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # elimina la instancia del token de autenticación asociado al usuario de la base de datos
+        request.user.auth_token.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
