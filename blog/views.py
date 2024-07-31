@@ -15,4 +15,14 @@ class PostUserList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Post.objects.filter(author=user).order_by("-updated_at")
+        return Post.objects.filter(author=user)
+
+
+class CreatePost(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def perform_create(self, serializer):
+        # Asocia el nuevo post con el usuario autenticado
+        serializer.save(author=self.request.user)

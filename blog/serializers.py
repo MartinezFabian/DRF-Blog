@@ -14,6 +14,8 @@ class PostSerializer(serializers.ModelSerializer):
             "published",
             "updated_at",
             "status",
+            "category",
+            "author",
         )
 
-        read_only_fields = ("published", "updated_at")
+        read_only_fields = ("published", "updated_at", "slug", "author")

@@ -8,22 +8,6 @@ from django.contrib.auth.models import (
 
 
 class CustomAccountManager(BaseUserManager):
-    def create_user(
-        self, email, username, password, first_name, last_name, **other_fields
-    ):
-        if not email:
-            raise ValueError("Email is required")
-
-        email = self.normalize_email(email)
-        user = self.model(
-            email=email, username=username, first_name=first_name, last_name=last_name
-        )
-        # se establece la contraseña utilizando el método set_password. Esto asegura que se almacene de manera segura (hashed)
-        user.set_password(password)
-        user.save()
-
-        return user
-
     def create_superuser(
         self, email, username, password, first_name, last_name, **other_fields
     ):
@@ -39,6 +23,26 @@ class CustomAccountManager(BaseUserManager):
         return self.create_user(
             email, username, password, first_name, last_name, **other_fields
         )
+
+    def create_user(
+        self, email, username, password, first_name, last_name, **other_fields
+    ):
+        if not email:
+            raise ValueError("Email is required")
+
+        email = self.normalize_email(email)
+        user = self.model(
+            email=email,
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            **other_fields
+        )
+        # se establece la contraseña utilizando el método set_password. Esto asegura que se almacene de manera segura (hashed)
+        user.set_password(password)
+        user.save()
+
+        return user
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
