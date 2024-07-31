@@ -26,3 +26,13 @@ class CreatePost(generics.CreateAPIView):
     def perform_create(self, serializer):
         # Asocia el nuevo post con el usuario autenticado
         serializer.save(author=self.request.user)
+
+
+class UpdatePost(generics.UpdateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(author=user)
