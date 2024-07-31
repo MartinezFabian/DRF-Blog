@@ -29,6 +29,7 @@ class Post(models.Model):
     content = models.TextField()
     slug = models.SlugField(max_length=250, unique=True)
     published = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default="P")
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
