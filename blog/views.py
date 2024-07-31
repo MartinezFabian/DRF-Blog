@@ -1,7 +1,8 @@
 from rest_framework import generics
-from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
+from django.db.models.query_utils import Q
 
 from .serializers import PostSerializer
 from .models import Post
@@ -23,6 +24,19 @@ class PostDetail(generics.RetrieveAPIView):
     def get_object(self, queryset=None, **kwargs):
         slug_query = self.kwargs.get("pk")
         return get_object_or_404(Post, slug=slug_query)
+
+
+class PostSearch(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        search_term = self.request.query_params.get("s")
+
+        return Post.objects.filter(
+            Q(title__icontains=search_term)
+            | Q(excerpt__icontains=search_term)
+            | Q(content__icontains=search_term)
+        )
 
 
 # only authenticated users
