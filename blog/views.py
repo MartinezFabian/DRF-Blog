@@ -36,3 +36,13 @@ class UpdatePost(generics.UpdateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Post.objects.filter(author=user)
+
+
+class DeletePost(generics.DestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(author=user)
