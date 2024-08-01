@@ -1,8 +1,9 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
 from django.db.models.query_utils import Q
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import PostSerializer
 from .models import Post
@@ -40,6 +41,19 @@ class PostSearch(generics.ListAPIView):
 
 
 # only authenticated users
+
+
+class CreatePost(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def perform_create(self, serializer):
+        # Asocia el nuevo post con el usuario autenticado
+        serializer.save(author=self.request.user)
+
+
 class UserPostList(generics.ListAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -48,16 +62,6 @@ class UserPostList(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Post.objects.filter(author=user)
-
-
-class CreatePost(generics.CreateAPIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = PostSerializer
-
-    def perform_create(self, serializer):
-        # Asocia el nuevo post con el usuario autenticado
-        serializer.save(author=self.request.user)
 
 
 class UpdatePost(generics.UpdateAPIView):

@@ -7,6 +7,10 @@ from django.utils.text import slugify
 User = settings.AUTH_USER_MODEL  # reference to users/CustomUser
 
 
+def upload_to(instance, filename):
+    return "posts/{filename}".format(filename=filename)
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -32,6 +36,7 @@ class Post(models.Model):
     published = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default="P")
+    image = models.ImageField(upload_to=upload_to, default="posts/default.png")
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, default=1)
